@@ -4,9 +4,9 @@
 The project wiki for the team *odysseus-chartreuse*. 
 
 ## Team Members
-- Quinn Horton
-- Samuel Harding
-- Yogansh Bhalla
+- Quinn Horton (XXXXXXXX)
+- Samuel Harding (47423864)
+- Yogansh Bhalla (XXXXXXXX)
 
 ## Pages
 - [Project Description](/pages/description.md)
