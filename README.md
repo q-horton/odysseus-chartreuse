@@ -7,3 +7,9 @@ The project wiki for the team *odysseus-chartreuse*.
 - Quinn Horton
 - Samuel Harding
 - Yogansh Bhalla
+
+## Description
+
+## Block Diagram
+
+## DIKW Pyramid
