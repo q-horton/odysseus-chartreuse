@@ -8,8 +8,5 @@ The project wiki for the team *odysseus-chartreuse*.
 - Samuel Harding
 - Yogansh Bhalla
 
-## Description
-
-## Block Diagram
-
-## DIKW Pyramid
+## Pages
+- [Project Description](/pages/description.md)
