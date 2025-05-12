@@ -1,7 +1,9 @@
 # odysseus-chartreuse
-The repository/wiki for CSSE4011 2025-S1 project team **odysseus-chartreuse**. 
+**CSSE4011 Project (Semester 1 2025)**
+
+The repository/wiki for the team *odysseus-chartreuse*. 
 
 ## Team Members
 - Quinn Horton
-- Sam Harding
+- Samuel Harding
 - Yogansh Bhalla
