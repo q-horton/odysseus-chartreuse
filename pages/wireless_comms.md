@@ -19,3 +19,6 @@ MQTT protocol. This will be done via an MQTT broker hosted on UQ Cloud.
 - The PC will transmit data to the web dashboard using HTTP (presumably over
 either WiFi or ethernet).
 
+The diagram below illustrates this network:
+
+<img src="/images/wireless.png" width="600"/>
