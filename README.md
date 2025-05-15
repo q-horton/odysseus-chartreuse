@@ -14,4 +14,6 @@ The project wiki for the team *Odysseus-Chartreuse*.
 - [Deliverables](/pages/deliverables.md)
 
 ## Roles and Responsibilities
-- Yogansh Bhalla: Responsible for mobile node development and design, prototyping, programming of the hardware and software for the data muling carrier (vehicle). Also responsible for development and operations of Dashboard and PC GUI for System Control and Monitoring. 
+- Yogansh Bhalla: Responsible for mobile node development and design, prototyping, programming of the hardware and software for the data muling carrier (vehicle). Also responsible for development and operations of Dashboard and PC GUI for System Control and Monitoring.
+- Samuel Harding: Responsible for development of the base node, including the communications with the mobile node and the PC, as well as processing performed on the data collected from
+the sensor nodes.
