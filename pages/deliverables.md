@@ -19,5 +19,5 @@ The success of the project will be assessed using the following Delieverables an
 - KPI: Percentage incoming data and system actions loss / corruption in logging and display. 
 
 5. Fault Tolerance & Data Integrity
-Deliverable: Add error checking, retries, and redundancy to ensure reliable data transfer and recovery.
-KPI: System maintains >90% data integrity under simulated packet loss or node failure.
+- Deliverable: Add error checking, retries, and redundancy to ensure reliable data transfer and recovery.
+- KPI: System maintains >90% data integrity under simulated packet loss or node failure.
