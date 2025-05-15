@@ -1,7 +1,6 @@
-# odysseus-chartreuse
+# Dam Floodgate Control System with Downstream Inundation Level Data Muling (Odysseus-Chartreuse)
 **CSSE4011 Project (Semester 1 2025)**
-
-The project wiki for the team *odysseus-chartreuse*. 
+The project wiki for the team *Odysseus-Chartreuse*. 
 
 ## Team Members
 - Quinn Horton (46975919)
@@ -13,3 +12,6 @@ The project wiki for the team *odysseus-chartreuse*.
 - [System Integration](/pages/system_integration.md)
 - [Wireless Network Communications](/pages/wireless_comms.md)
 - [Deliverables](/pages/deliverables.md)
+
+## Roles and Responsibilities
+- Yogansh Bhalla: Responsible for mobile node development and design, prototyping, programming of the hardware and software for the data muling carrier (vehicle). Also responsible for development and operations of Dashboard and PC GUI for System Control and Monitoring. 
