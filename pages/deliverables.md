@@ -8,7 +8,7 @@ The success of the project will be assessed using the following Delieverables an
 
 2. Mule Node Networking
 - Deliverable: Mobile node software to collect data from sensors and forward to the base node.
-- KPI: Percentage ($) collected sensor data forwarded to base node without loss or corruption - >95%.
+- KPI: Percentage (%) collected sensor data forwarded to base node without loss or corruption - >95%.
 
 3. Base Node & Dam Controller Logic
 - Deliverable: Central node receives data, stores it, and controls dam gates based on environmental conditions.
