@@ -23,3 +23,5 @@ The DIKW (Data-Information-Knowledge-Wisdom) Pyramid is a model used to display 
 - ***Wisdom:*** With the above knowledge, trends and patterns can be extrapolated to start making predictions of future weather patterns.
 
 Including people in the loop (eg via access to the dashboard), the levels of knowledge and wisdom would extend to include manual considerations.
+
+<img src="/images/pyramid.png" width="600"/>
