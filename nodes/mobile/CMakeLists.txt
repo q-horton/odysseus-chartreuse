@@ -6,7 +6,7 @@ project(final_mobile)
 
 target_sources(app PRIVATE 
     src/main.c
-    ./../../../mylib/ble_observer_ext_ad.c
+    src/ble_observer_ext_ad.c
 )
 
 # Include directories
