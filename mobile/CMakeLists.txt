@@ -6,7 +6,7 @@ project(final_mobile)
 
 target_sources(app PRIVATE 
     src/main.c
-    ./../../../mylib/ble_observer_filtered.c
+    ./../../../mylib/ble_observer_ext_ad.c
 )
 
 # Include directories
@@ -14,8 +14,4 @@ target_include_directories(app PRIVATE
     ../../../include
 )
 
-zephyr_library_include_directories(${ZEPHYR_BASE}/samples/bluetooth)
 
-# Verify built through sysbuild to ensure MCUboot automatically 
-# included and that sample specific MCUboot configurations are used when building MCUboot.
-test_sysbuild()
