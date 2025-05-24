@@ -3,9 +3,9 @@
 cmake_minimum_required(VERSION 3.20.0)
 
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
-project(peripheral_gatt_write)
+project(sensornode_dev)
 
-FILE(GLOB app_sources src/*.c ../central_gatt_write/src/gatt_write_common.c)
+FILE(GLOB app_sources src/*.c src/sensornode_observer.c)
 target_sources(app PRIVATE
   ${app_sources}
   )

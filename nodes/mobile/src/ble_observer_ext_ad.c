@@ -14,7 +14,6 @@
 
 #define NAME_LEN 30
 #define RSSI_THRESHOLD -50 // RSSI threshold for filtering devices
-//#define NODE_OF_INTEREST "C5:84:32:CA:99:CA (random)" // MAC address of the node of interest
 
 // array of MAC addresses to filter
 const char *nodes_of_interest[] = {
@@ -86,31 +85,31 @@ static bool parse_ad_data(struct bt_data *data, void *user_data) {
 // }
 
 #if defined(CONFIG_BT_EXT_ADV)
-	static bool data_cb(struct bt_data *data, void *user_data) {
-		char *name = user_data;
-		uint8_t len;
+	// static bool data_cb(struct bt_data *data, void *user_data) {
+	// 	char *name = user_data;
+	// 	uint8_t len;
 
-		switch (data->type) {
-			case BT_DATA_NAME_SHORTENED:
-			case BT_DATA_NAME_COMPLETE:
-				len = MIN(data->data_len, NAME_LEN - 1);
-				(void)memcpy(name, data->data, len);
-				name[len] = '\0';
-				return false;
-			default:
-				return true;
-		}
-	}
+	// 	switch (data->type) {
+	// 		case BT_DATA_NAME_SHORTENED:
+	// 		case BT_DATA_NAME_COMPLETE:
+	// 			len = MIN(data->data_len, NAME_LEN - 1);
+	// 			(void)memcpy(name, data->data, len);
+	// 			name[len] = '\0';
+	// 			return false;
+	// 		default:
+	// 			return true;
+	// 	}
+	// }
 
-	static const char *phy2str(uint8_t phy) {
-		switch (phy) {
-		case BT_GAP_LE_PHY_NONE: return "No packets";
-		case BT_GAP_LE_PHY_1M: return "LE 1M";
-		case BT_GAP_LE_PHY_2M: return "LE 2M";
-		case BT_GAP_LE_PHY_CODED: return "LE Coded";
-		default: return "Unknown";
-		}
-	}
+	// static const char *phy2str(uint8_t phy) {
+	// 	switch (phy) {
+	// 	case BT_GAP_LE_PHY_NONE: return "No packets";
+	// 	case BT_GAP_LE_PHY_1M: return "LE 1M";
+	// 	case BT_GAP_LE_PHY_2M: return "LE 2M";
+	// 	case BT_GAP_LE_PHY_CODED: return "LE Coded";
+	// 	default: return "Unknown";
+	// 	}
+	// }
 
 	static void scan_recv(const struct bt_le_scan_recv_info *info, struct net_buf_simple *buf) {
 		
@@ -130,8 +129,6 @@ static bool parse_ad_data(struct bt_data *data, void *user_data) {
 
 		bt_addr_le_to_str(info->addr, le_addr, sizeof(le_addr));
 		printk("[DEVICE]: %s, RSSI: %d, Data len: %u\n", le_addr, info->rssi, buf->len);
-
-		
 
 		//data_status = BT_HCI_LE_ADV_EVT_TYPE_DATA_STATUS(info->adv_props);
 
