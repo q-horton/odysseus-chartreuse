@@ -1,3 +1,10 @@
 .DS_Store
 nodes/base_node/build
 nodes/wifi_node/build
+
+.west
+bootloader
+build
+modules
+tools
+zephyr
