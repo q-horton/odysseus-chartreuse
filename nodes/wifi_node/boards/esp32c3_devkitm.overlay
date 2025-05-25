@@ -1,4 +1,0 @@
-&wifi {
-	status = "okay";
-};
-
