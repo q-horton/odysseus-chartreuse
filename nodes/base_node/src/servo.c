@@ -4,8 +4,8 @@
 
 #include <stdint.h>
 
-static const struct pwm_dt_spec pan_servo = PWM_DT_SPEC_GET(DT_NODELABEL(pwm_servo0));
-static const struct pwm_dt_spec tilt_servo = PWM_DT_SPEC_GET(DT_NODELABEL(pwm_servo1));
+static const struct pwm_dt_spec pan_servo = PWM_DT_SPEC_GET(DT_NODELABEL(pan_servo));
+static const struct pwm_dt_spec tilt_servo = PWM_DT_SPEC_GET(DT_NODELABEL(tilt_servo));
 
 #define SERVO_PW_US_MIN_ANGLE 400
 #define SERVO_PW_US_MAX_ANGLE 2500
