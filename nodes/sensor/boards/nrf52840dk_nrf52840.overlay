@@ -1,0 +1,51 @@
+&adc {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	channel@0 {
+		reg = <0>;
+		zephyr,gain = "ADC_GAIN_2";
+		zephyr,reference = "ADC_REF_INTERNAL";
+		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+		zephyr,input-positive = <NRF_SAADC_AIN1>; /* P0.03 */
+		zephyr,resolution = <12>;
+	};
+};
+
+&i2c0 {
+	ht0: dht@5c {
+		compatible = "aosong,dht";
+		label = "dht12";
+		reg = <0x5c>;
+		dio-gpios = <&gpio0 26 GPIO_ACTIVE_HIGH>;
+		status = "okay";
+	};
+	
+	press0: bmp280@76 {
+		compatible = "bosch,bme280";
+		label = "bmp280";
+		reg = <0x76>;
+		status = "okay";
+		//supply-gpios = <&gpio0 27 GPIO_ACTIVE_HIGH>;
+	};
+	
+	mag0: bmm150@10 {
+		compatible = "bosch,bmm150";
+		label = "bmm150";
+		reg = <0x10>;
+		status = "okay";
+		//supply-gpios = <&gpio0 27 GPIO_ACTIVE_HIGH>;
+		//drdy-gpios = <&gpio0 26 GPIO_ACTIVE_HIGH>;
+	};
+};
+
+/ {
+	zephyr,user {
+		io-channels = <&adc 0>;//, <&adc 1>, <&adc 7>;
+	};
+
+	aliases {
+		ht0 = &ht0;
+		press0 = &press0;
+	};
+};
