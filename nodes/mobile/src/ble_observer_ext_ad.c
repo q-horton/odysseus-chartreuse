@@ -68,7 +68,7 @@ static struct bt_le_scan_cb scan_callbacks = {
 };
 
 
-int observer_start(void) {
+int sensornode_observer_start(void) {
 
 	struct bt_le_scan_param scan_param = {
 		.type       = BT_LE_SCAN_TYPE_PASSIVE,
