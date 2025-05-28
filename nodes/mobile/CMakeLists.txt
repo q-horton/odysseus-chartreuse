@@ -12,6 +12,7 @@ target_sources(app PRIVATE
 # Include directories
 target_include_directories(app PRIVATE 
     ../../../include
+    ./src
 )
 
 

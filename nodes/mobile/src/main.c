@@ -8,13 +8,12 @@
 #include <zephyr/sys/printk.h>
 #include <zephyr/bluetooth/bluetooth.h>
 #include <zephyr/bluetooth/hci.h>
+#include "shared_vars.h"
 
 #define SENSOR_ADV_INTERVAL_MS 1000
 #define DEVICE_NAME "MobileNode"
 
 K_SEM_DEFINE(timer_access, 1, 1); // Semaphore for synchronization
-
-int observer_start(void);
 
 static uint8_t mobile_adv_payload_general[5] = {0};  // Room for mobile node data
 static struct bt_data ad[] = {
@@ -23,8 +22,11 @@ static struct bt_data ad[] = {
     BT_DATA(BT_DATA_MANUFACTURER_DATA, mobile_adv_payload_general, sizeof(mobile_adv_payload_general)),
 };
 
+// Function Prototypes
+int observer_start(void);
+
+// Global Variables
 static struct k_timer second_timer;
-// Mobile Node Data
 static uint32_t current_time = 0;
 uint8_t flags = 0x10; // Polling Rate (hrs) / Disable Sensors
 
@@ -52,13 +54,13 @@ static void update_mobile_adv_payload_general(void) {
 	mobile_adv_payload_general[4] = flags;  
 
 	// Print updated count value and flags
-	printk("MobileNode Adv Payload Updated: Time: %u, Flags: 0x%02X\n", current_time, flags);
+	printk("[MOBILE-LOG] Adv Payload Updated: Time: %u, Flags: 0x%02X\n", current_time, flags);
 }
 
 int main(void) {
 	
 	int err;
-	printk("Starting MobileNode...\n");
+	printk("[MOBILE-LOG] Starting MobileNode...\n");
 
 	k_timer_init(&second_timer, timer_handler, NULL);
     k_timer_start(&second_timer, K_SECONDS(1), K_SECONDS(1));
@@ -66,14 +68,16 @@ int main(void) {
 	// Initialise the Bluetooth Subsystem 
 	err = bt_enable(NULL);
 	if (err) {
-		printk("Bluetooth init failed (err %d).\n", err);
+		printk("[MOBILE-ERR] Bluetooth init failed (err %d).\n", err);
 		return -1;
 	}
 
-	// Start scanner
+	// Start Extended Advertising Observer
 	(void) observer_start();
 
-	// Begin advertising
+	// Start Legacy Advertising Observer
+
+	// Begin advertising Timestamp and flags
 	err = bt_le_adv_start(
 		BT_LE_ADV_PARAM(
 			BT_LE_ADV_OPT_USE_IDENTITY,
@@ -81,8 +85,9 @@ int main(void) {
 			BT_GAP_ADV_FAST_INT_MAX_2,
 			NULL),
 		ad, ARRAY_SIZE(ad), NULL, 0);
+
     if (err) {
-        printk("Advertising failed to start (err %d).\n", err);
+        printk("[MOBILE-ERR] Advertising failed to start (err %d).\n", err);
         return -1;
     }
 
