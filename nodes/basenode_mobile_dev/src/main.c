@@ -47,8 +47,8 @@ static void update_base_adv_payload_general(void) {
     basenode_adv_payload_general[1] = (current_time >> 8) & 0xFF;   
     basenode_adv_payload_general[2] = (current_time >> 16) & 0xFF;  
     basenode_adv_payload_general[3] = (current_time >> 24) & 0xFF;
-	k_sem_give(&timer_access); // Allow access to the timer
 	basenode_adv_payload_general[4] = flags;  
+	k_sem_give(&timer_access); // Allow access to the timer
 
 	// Print updated count value and flags
 	printk("BaseNode Adv Payload Updated: Time: %u, Flags: 0x%02X\n", current_time, flags);

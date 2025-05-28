@@ -23,8 +23,7 @@ static struct bt_data ad[] = {
 };
 
 // Function Prototypes
-int sensornode_observer_start(void);
-int basenode_observer_start(void);
+int ble_observers_start(void);
 
 // Global Variables
 static struct k_timer second_timer;
@@ -72,10 +71,10 @@ int main(void) {
 	}
 
 	// Start Extended Advertising Observer
-	(void) sensornode_observer_start();
+	(void) ble_observers_start();
 
 	// Start Legacy Advertising Observer
-	basenode_observer_start();
+	//basenode_observer_start();
 
 	// Begin advertising Timestamp and flags
 	err = bt_le_adv_start(
