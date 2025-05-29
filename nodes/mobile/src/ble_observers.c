@@ -9,10 +9,8 @@
 #include <shared_vars.h>
 #include <string.h>
 
-// #define DEVICE_NAME "SensorNode"
-// #define SENSOR_ADV_INTERVAL_MS 1000
-// #define NAME_LEN 30
-#define BASENODE_MAC "DC:E9:F5:83:72:9C (random)" // MAC address of BaseNode
+// #define BASENODE_MAC "DC:E9:F5:83:72:9C (random)" // MAC address of BaseNode
+#define BASENODE_MAC "F9:E3:72:81:45:61 (random)" // MAC address of BaseNode
 #define MIN_INTERVAL_FOR_UPDATES 10
 
 typedef struct {
@@ -21,7 +19,8 @@ typedef struct {
 } sensor_nodes_t;
 
 sensor_nodes_t sensornodes_status[MAX_SENSOR_NODES] = {
-	{"C5:84:32:CA:99:CA (random)", false}
+	// {"C5:84:32:CA:99:CA (random)", false}
+	{"E4:41:28:44:C6:DE (random)", false}
 	// Add more MACs here
 };
 
@@ -69,10 +68,12 @@ static void device_found(const bt_addr_le_t *addr, int8_t rssi, uint8_t type, st
 
 static bool parse_ad_data(struct bt_data *data, void *user_data) {
 
+	//k_sem_take(&wait_for_ext_adv_update_sem, K_FOREVER); // Wait for semaphore to ensure data is ready
+
     if (data->type == BT_DATA_MANUFACTURER_DATA && data->data_len >= 5) {
         const uint8_t *payload = data->data;
 
-		printk("[MOBILE-DEBUG] Raw AD data: ");
+		printk("[MOBILE-DEBUG] Raw AD data: \n");
 		for (int i = 0; i < data->data_len; i++) {
 			printk("%02X ", payload[i]);
 
@@ -83,11 +84,10 @@ static bool parse_ad_data(struct bt_data *data, void *user_data) {
 				return false; 
 			}
 		}
-		printk("\n");
-    }
 
-	printk("[MOBILE-LOG] Parsed SensorData\n");
-	k_sem_give(&adv_data_ready_sem); // Signal that new data is ready
+		printk("[MOBILE-LOG] Parsed SensorData\n");
+		k_sem_give(&adv_data_ready_sem); // Signal that new data is ready
+    }
     return true;
 }
 

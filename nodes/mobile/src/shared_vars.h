@@ -17,7 +17,6 @@ extern struct k_sem access_sensor_config_data; // Semaphore for time, flags
 
 // From main.c, ble_sensordata_ext_ad.c
 extern struct k_sem adv_data_ready_sem; // Semaphore for time, flags
-
-
+extern struct k_sem wait_for_ext_adv_update_sem;
 
 #endif
