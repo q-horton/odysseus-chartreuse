@@ -3,7 +3,7 @@
 
 #include <zephyr/kernel.h>
 
-extern struct k_msgq queue_sensor_data;
+extern struct k_msgq queue_pub_mqtt;
 
 void espat_send(char *str);
 void espat_sanitize_arg(char *str, char *outbuf);

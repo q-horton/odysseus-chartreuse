@@ -1,28 +1,11 @@
 #include <zephyr/kernel.h>
 #include <zephyr/device.h>
 
-#include "servo.h"
+#include "filesystem.h"
+#include "bt_interface.h"
 
 int main() {
-    /*
-    set_pan_angle(90);
+    mount_filesystem();
 
-    while (1) {
-        k_msleep(1000);
-
-        set_tilt_angle(0);
-
-        k_msleep(1000);
-        set_tilt_angle(45);
-
-        k_msleep(1000);
-        set_tilt_angle(90);
-
-        k_msleep(1000);
-        set_tilt_angle(135);
-
-        k_msleep(1000);
-        set_tilt_angle(180);
-    }
-    */
+    bt_run();
 }
