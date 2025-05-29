@@ -4,6 +4,16 @@ LOG_MODULE_REGISTER(SensorData);
 
 static const struct adc_dt_spec adc_channel = ADC_DT_SPEC_GET_BY_IDX(DT_PATH(zephyr_user), 0);
 
+int polling_rate = 3;
+
+void update_polling_rate(int rate) {
+	polling_rate = rate;
+}
+
+int get_polling_rate(void) {
+	return polling_rate;
+}
+
 int sensor_t(void) {
 	const struct device* const humtemp = device_get_binding("dht12");
 	const struct device* const press = device_get_binding("bmp280");
@@ -43,6 +53,7 @@ int sensor_t(void) {
 		.buffer_size = sizeof(buf),
 	};
 
+	uint16_t reading_index = 0;
 	while(true) {
 		SensorLoad sl;
 		(void)adc_sequence_init_dt(&adc_channel, &sequence);
@@ -88,7 +99,9 @@ int sensor_t(void) {
 		sl.temp = temperature / 1000;
 	
 		sl.timestamp = get_sys_time();
+		sl.counter = reading_index;
 		rbs_put(&sl);
+		reading_index++;
 
 //		// Magnetic
 //		if(sensor_sample_fetch(press)) {
@@ -99,7 +112,7 @@ int sensor_t(void) {
 //		int64_t magnet = sensor_value_to_milli(&mag_val);
 //		if (magnet != 0) LOG_INF("BMM150 Mag: %lld\n", magnet);
 
-		k_msleep(3000);
+		k_msleep(polling_rate * 1000);
 	}
 
 	return 0;

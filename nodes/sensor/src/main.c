@@ -17,8 +17,8 @@ int main(void) {
 		if(rbs_data_available()) {
 			if(!rbs_get(&sl)) {
 				k_msgq_put(&sample_stream, &sl, K_FOREVER);
-				LOG_INF("Sensors:\r\n-----\r\nTime: %d\r\nSoil Moisture: %d\r\nTemperature: %d\r\nHumidity: %d\r\nPressure: %d\r\n",
-						sl.timestamp, sl.soil_moisture, sl.temp, sl.humidity, sl.pressure + (100 * 1000));
+				LOG_INF("Sensors:\r\n-----\r\nTime: %d\r\nReading Index: %d\r\nSoil Moisture: %d\r\nTemperature: %d\r\nPressure: %d\r\n",
+						sl.timestamp, sl.counter, sl.soil_moisture, sl.temp, sl.pressure + (100 * 1000));
 			}
 		}
 		k_msleep(1000);

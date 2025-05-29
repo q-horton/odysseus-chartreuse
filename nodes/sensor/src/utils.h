@@ -11,9 +11,9 @@
 
 typedef struct {
 	uint32_t timestamp;
+	uint16_t counter;
 	uint16_t soil_moisture;
 	uint16_t temp;
-	uint16_t humidity;
 	int16_t pressure;
 } SensorLoad;
 

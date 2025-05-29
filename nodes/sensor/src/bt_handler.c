@@ -1,11 +1,11 @@
 #include "bt_handler.h"
+#include "zephyr/bluetooth/gap.h"
 
 LOG_MODULE_REGISTER(BluetoothHandler);
 
 K_SEM_DEFINE(config_data, 1, 1); // Semaphore for synchronization
 K_MSGQ_DEFINE(sample_stream, sizeof(SensorLoad), 10, 1);
 
-uint8_t config_set_externally = 0;
 uint8_t polling_flag = 1; // Determines poll rate, ignored for now 
 
 // Custom sensor data payload, length + 5 bytes < 255
@@ -29,19 +29,21 @@ static struct bt_data ad[] = {
 static struct bt_le_ext_adv *adv_set;
 
 void init_adv_payload(void) {
-    k_sem_take(&config_data, K_FOREVER);
+	k_sem_take(&config_data, K_FOREVER);
 	// Remaining bytes can remain zero
 	for(int j = 0; j < NUM_PAYLOADS; j++) {
-    	for (int i = 0; i < PAYLOAD_SIZE; i++) {
-    	    payloads[j][i] = 0;
-    	}
+		for(int i = 0; i < PAYLOAD_SIZE; i++) {
+			if(j == 0 && i == 0) payloads[j][i] = SENSOR_NODE_ID;
+			else payloads[j][i] = 0;
+		}
 	}
 	k_sem_give(&config_data);
 }
 
 void update_adv_data(SensorLoad sample, uint16_t index) {
-	uint8_t packet = index * sizeof(sample) / PAYLOAD_SIZE;
-	uint8_t packet_index = index * sizeof(sample) % PAYLOAD_SIZE;
+	index++;
+	uint8_t packet = (index * sizeof(sample)) / PAYLOAD_SIZE;
+	uint8_t packet_index = (index * sizeof(sample)) % PAYLOAD_SIZE;
 	LOG_INF("Packet: %d; Packet index: %d\n", packet, packet_index);
 	uint8_t* byte_stream = (void*)&sample;
     k_sem_take(&config_data, K_FOREVER);
@@ -59,13 +61,12 @@ static bool parse_ad_data(struct bt_data *data, void *user_data) {
 
         // Based on the above, extract current_time_ms
         uint32_t newtime = (payload[0] | (payload[1] << 8) | (payload[2] << 16) | (payload[3] << 24));
-        int32_t time_delta = (int32_t)(newtime - 0);
+        int32_t time_delta = (int32_t)(newtime - get_sys_time());
 
-        if (time_delta > MIN_INTERVAL_FOR_UPDATES || time_delta < -MIN_INTERVAL_FOR_UPDATES || polling_flag != payload[4]) {
+        if (time_delta > MIN_INTERVAL_FOR_UPDATES || time_delta < -MIN_INTERVAL_FOR_UPDATES || get_polling_rate() != payload[4]) {
             LOG_INF("[SENSORNODE-LOG] Received new time: %u, Polling flag: %u\n", newtime, payload[4]);
-            //update_sys_time(newtime);
-            polling_flag = payload[4];
-            config_set_externally = 1;
+            update_sys_time(newtime);
+            update_polling_rate(payload[4]);
         }
         k_sem_give(&config_data);
     }
@@ -74,7 +75,7 @@ static bool parse_ad_data(struct bt_data *data, void *user_data) {
 
 static void device_found(const bt_addr_le_t *addr, int8_t rssi, uint8_t type, struct net_buf_simple *ad) {
 	
-    if (rssi < RSSI_THRESHOLD) {
+    if (rssi < RSSI_THRESHOLD || type == BT_GAP_ADV_TYPE_EXT_ADV) {
 		return; // Ignore weak signals
 	}
 	char addr_str[BT_ADDR_LE_STR_LEN];
@@ -154,8 +155,9 @@ void bt_handler_t(void) {
 		for (int i = 0; i < k_msgq_num_used_get(&sample_stream); i++) {
 			SensorLoad sample;
 			k_msgq_get(&sample_stream, &sample, K_FOREVER);
+			LOG_INF("Index: %d", index);
 			update_adv_data(sample, index);
-			index = (index + 1) % (PAYLOAD_SIZE * NUM_PAYLOADS);
+			index = (index + 1) % (PAYLOAD_SIZE * NUM_PAYLOADS / sizeof(sample) - 1);
 		}
    
         err = bt_le_ext_adv_set_data(adv_set, ad, ARRAY_SIZE(ad), NULL, 0);
