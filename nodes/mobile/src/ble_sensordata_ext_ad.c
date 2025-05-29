@@ -29,6 +29,7 @@ K_SEM_DEFINE(wait_for_ext_adv_update_sem, 1, 1);
 
 // Prototypes
 void print_converted_data(uint8_t*);
+void update_adv_payload(void);
 
 // Custom sensor data payload, length + 5 bytes < 255
 __aligned(4) static uint8_t adv_payload[ADV_PAYLOAD_BUF_SIZE] = {0};  
@@ -49,7 +50,7 @@ uint16_t greatestReceivedMeasId = 0;
 void update_adv_payload(void) {
 
     // Put first current_time into first 4 bytes of adv_payload
-    k_sem_take(&adv_data_ready_sem, K_FOREVER);
+    // k_sem_take(&adv_data_ready_sem, K_FOREVER);
 
     // printk("[MOBILENODE-LOG] RAW DATABUFF...\n");
     // for (int i = 0; i < 1650; i++) {
@@ -129,7 +130,7 @@ void adv_update_thread(void *a, void *b, void *c) {
 
         printk("[MOBILENODE-THREAD] Advertising updated\n");
 
-        k_sem_give(&wait_for_ext_adv_update_sem); // Signal that update is done
+        //k_sem_give(&wait_for_ext_adv_update_sem); // Signal that update is done
     }
 }
 
@@ -145,7 +146,7 @@ int ble_ext_adv_sensordata_start(void) {
     
     printk("[SENSORNODE-LOG] Starting SensorNode BLE extended advertiser\n");
 
-    update_adv_payload();
+    //update_adv_payload();
 
     err = bt_le_ext_adv_create(&adv_params, NULL, &adv_set);
     if (err) {
