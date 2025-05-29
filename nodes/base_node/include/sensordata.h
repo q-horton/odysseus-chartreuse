@@ -15,4 +15,7 @@ struct SensorData {
 
 void encode_sensor_data(struct SensorData *data, char *buf, int bufSize);
 
+void set_setpoint(int val);
+int get_setpoint(void);
+
 #endif // SENSORDATA_H
