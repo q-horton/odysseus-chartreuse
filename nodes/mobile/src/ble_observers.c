@@ -12,7 +12,7 @@
 // #define DEVICE_NAME "SensorNode"
 // #define SENSOR_ADV_INTERVAL_MS 1000
 // #define NAME_LEN 30
-#define BASENODE_MAC "C5:84:32:CA:99:CA (random)" // MAC address of BaseNode
+#define BASENODE_MAC "DC:E9:F5:83:72:9C (random)" // MAC address of BaseNode
 #define MIN_INTERVAL_FOR_UPDATES 10
 
 typedef struct {
@@ -38,12 +38,6 @@ static bool parse_config_data_from_basenode_ad(struct bt_data *data, void *user_
         k_sem_take(&access_sensor_config_data, K_FOREVER); 
 
         const uint8_t *payload = data->data;
-
-        // // Based on the above, extract current_time_ms
-        // current_time = (payload[0] | (payload[1] << 8) | (payload[2] << 16) | (payload[3] << 24));
-        // // Extract flags from uint8_t
-        // flags = payload[4];
-
 		 // Based on the above, extract current_time_ms
         uint32_t newtime = (payload[0] | (payload[1] << 8) | (payload[2] << 16) | (payload[3] << 24));
         int32_t time_delta = (int32_t)(newtime - current_time);
@@ -71,6 +65,19 @@ static void device_found(const bt_addr_le_t *addr, int8_t rssi, uint8_t type, st
     if (strcmp(addr_str, BASENODE_MAC) == 0) {
         bt_data_parse(ad, parse_config_data_from_basenode_ad, NULL);
         //k_sleep(K_MSEC(1000));
+
+		// Disable advertising after receiving config data
+		//bt_le_adv_stop();
+
+		// Potentiaally use a flag to check if already off, so dont repeat operations
+		// 
+		// Enable extended advertising
+
+		// Send data to BaseNode
+
+		// Disable extended advertising
+
+		// Enable legacy advertising
     }
 }
 
@@ -94,6 +101,7 @@ static bool parse_ad_data(struct bt_data *data, void *user_data) {
     }
 
 	printk("[MOBILE-LOG] Parsed SensorData\n");
+	k_sem_give(&adv_data_ready_sem); // Signal that new data is ready
     return true;
 }
 

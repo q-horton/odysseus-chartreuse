@@ -51,13 +51,13 @@ static void update_base_adv_payload_general(void) {
 	k_sem_give(&timer_access); // Allow access to the timer
 
 	// Print updated count value and flags
-	printk("BaseNode Adv Payload Updated: Time: %u, Flags: 0x%02X\n", current_time, flags);
+	printk("[BASENODE-LOG] Adv Payload Updated: Time: %u, Flags: 0x%02X\n", current_time, flags);
 }
 
 int main(void) {
 	
 	int err;
-	printk("Starting BaseNode...\n");
+	printk("[BASENODE-LOG] Starting BaseNode...\n");
 
 	k_timer_init(&second_timer, timer_handler, NULL);
     k_timer_start(&second_timer, K_SECONDS(1), K_SECONDS(1));

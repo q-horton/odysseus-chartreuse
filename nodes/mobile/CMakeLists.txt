@@ -7,7 +7,7 @@ project(final_mobile)
 target_sources(app PRIVATE 
     src/main.c
     src/ble_observers.c
-    src/ble_observer_normal_ad.c
+    src/ble_sensordata_ext_ad.c
 )
 
 # Include directories

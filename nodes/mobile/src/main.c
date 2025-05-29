@@ -11,7 +11,7 @@
 #include "shared_vars.h"
 
 #define SENSOR_ADV_INTERVAL_MS 1000
-#define DEVICE_NAME "MobileNode"
+// #define DEVICE_NAME "MobileNode"
 
 K_SEM_DEFINE(access_sensor_config_data, 1, 1); // Semaphore for synchronization
 
@@ -24,6 +24,7 @@ static struct bt_data ad[] = {
 
 // Function Prototypes
 int ble_observers_start(void);
+int ble_ext_adv_sensordata_start(void);
 
 // Global Variables
 static struct k_timer second_timer;
@@ -73,10 +74,10 @@ int main(void) {
 	// Start Extended Advertising Observer
 	(void) ble_observers_start();
 
-	// Start Legacy Advertising Observer
-	//basenode_observer_start();
+	// Start Extended Advertising
+	(void) ble_ext_adv_sensordata_start();
 
-	// Begin advertising Timestamp and flags
+	// Begin legacy advertising Timestamp and flags
 	err = bt_le_adv_start(
 		BT_LE_ADV_PARAM(
 			BT_LE_ADV_OPT_USE_IDENTITY,
