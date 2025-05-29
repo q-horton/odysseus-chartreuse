@@ -27,8 +27,8 @@ static struct bt_data ad[] = {
 
 // Mobile Node Data
 static struct k_timer second_timer;
-static uint32_t current_time = 0;
-uint8_t flags = 0x10; // Polling Rate (hrs) / Disable Sensors
+uint32_t current_time = 0;
+uint8_t flags = 0x03; // Polling Rate (hrs) / Disable Sensors
 
 void timer_handler(struct k_timer *dummy) {
     
@@ -54,7 +54,7 @@ static void update_base_adv_payload_general(void) {
 	k_sem_give(&timer_access); // Allow access to the timer
 
 	// Print updated count value and flags
-	LOG_INF("BaseNode Adv Payload Updated: Time: %u, Flags: 0x%02X\n", current_time, flags);
+	//LOG_INF("BaseNode Adv Payload Updated: Time: %u, Flags: 0x%02X\n", current_time, flags);
 }
 
 int bt_run(void) {

@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#define PAN_HOME 110
+#define PAN_HOME 25
 #define TILT_DAM_UP 65
 #define TILT_DAM_DOWN 155
 

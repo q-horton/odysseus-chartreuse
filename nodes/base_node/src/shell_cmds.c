@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <stdio.h>
 #include <zephyr/kernel.h>
 #include <zephyr/shell/shell.h>
@@ -8,6 +9,7 @@
 #include "sensordata.h"
 #include "servo.h"
 #include "filesystem.h"
+#include "bt_interface.h"
 
 static int cmd_espat_send(const struct shell *sh, size_t argc,
                            char **argv)
@@ -89,6 +91,47 @@ static int cmd_sensorlog_disable(const struct shell *sh, size_t argc,
     return 0;
 }
 
+static int cmd_sampling_set(const struct shell *sh, size_t argc,
+                           char **argv)
+{
+
+    uint8_t rate = atoi(argv[1]);
+
+    if (rate < 1 || rate > 255) {
+        shell_error(sh, "Sampling rate must be between 1 and 255");
+        return 1;
+    }
+
+    flags = rate;
+
+    return 0;
+}
+
+static int cmd_sampling_disable(const struct shell *sh, size_t argc,
+                           char **argv)
+{
+    flags = 0;
+    return 0;
+}
+
+static int cmd_time_set(const struct shell *sh, size_t argc,
+                           char **argv)
+{
+	k_sem_take(&timer_access, K_FOREVER);
+    current_time = atoi(argv[1]);
+    k_sem_give(&timer_access);
+    return 0;
+}
+
+static int cmd_time_get(const struct shell *sh, size_t argc,
+                           char **argv)
+{
+	k_sem_take(&timer_access, K_FOREVER);
+    shell_print(sh, "%d", current_time);
+    k_sem_give(&timer_access);
+    return 0;
+}
+
 SHELL_STATIC_SUBCMD_SET_CREATE(sub_espat,
         SHELL_CMD_ARG(send, NULL, "Usage: espat send <MESSAGE>", cmd_espat_send, 2, 0),
         SHELL_CMD_ARG(mqtt_conn, NULL, "Usage: espat mqtt_conn <ip> <port>", cmd_espat_mqtt_conn, 3, 0),
@@ -111,6 +154,21 @@ SHELL_STATIC_SUBCMD_SET_CREATE(sub_sensorlog,
         SHELL_SUBCMD_SET_END
 );
 
+SHELL_STATIC_SUBCMD_SET_CREATE(sub_sampling,
+        SHELL_CMD_ARG(set, NULL, "Set sampling rate", cmd_sampling_set, 2, 0),
+        SHELL_CMD_ARG(disable, NULL, "Disable sensor sampling", cmd_sampling_disable, 1, 0),
+        SHELL_SUBCMD_SET_END
+);
+
+SHELL_STATIC_SUBCMD_SET_CREATE(sub_time,
+        SHELL_CMD_ARG(set, NULL, "Set system time", cmd_time_set, 2, 0),
+        SHELL_CMD_ARG(get, NULL, "Get system time", cmd_time_get, 1, 0),
+        SHELL_SUBCMD_SET_END
+);
+
 SHELL_CMD_REGISTER(espat, &sub_espat, "ESP-AT commands", NULL);
 SHELL_CMD_REGISTER(servo, &sub_servo, "Servo motor commands", NULL);
 SHELL_CMD_REGISTER(sensorlog, &sub_sensorlog, "Sensor FS logging commands", NULL);
+SHELL_CMD_REGISTER(sampling, &sub_sampling, "Sensor sampling commands", NULL);
+
+SHELL_CMD_REGISTER(time, &sub_time, "Set clock time", NULL);

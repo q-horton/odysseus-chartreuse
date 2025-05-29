@@ -24,8 +24,7 @@ LOG_MODULE_REGISTER(basenode_bt_obs);
 
 // array of MAC addresses to filter
 const char *nodes_of_interest[] = {
-	//"C5:84:32:CA:99:CA (random)"
-	"DC:E9:F5:83:72:9C (random)"
+	"DC:B1:BE:10:38:1E (random)"
 	//"E4:41:28:44:C6:DE (random)"
 };
 
@@ -85,10 +84,8 @@ void parse_sensor_payload(const uint8_t *payload) {
 
         k_msgq_put(&queue_sensor_data, &data, K_NO_WAIT);
         
-        /*
         LOG_INF("Sensor Data (ID %u) - Time: %u, Moisture: %u, Temp: %u, Pressure: %d",
                measId, timestamp, moisture, temp, pressure);
-        */
     }
 }
 
@@ -99,9 +96,9 @@ static bool parse_ad_data(struct bt_data *data, void *user_data) {
         parse_sensor_payload(payload);
 
         /*
-		LOG_INF("\t \t [DEBUG] Raw AD data: ");
+		printf("\t \t [DEBUG] Raw AD data: ");
 		for (int i = 0; i < data->data_len; i++) {
-			printk("%02X ", payload[i]);
+			printf("%02X ", payload[i]);
 		}
 		printk("\n");
         */

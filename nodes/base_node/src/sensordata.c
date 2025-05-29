@@ -26,13 +26,13 @@ void encode_sensor_data(struct SensorData *data, char *buf, int bufSize) {
     json_obj_encode_buf(sensor_data_descr, 5, data, buf, bufSize);
 }
 
-float pid_update(float value, float time, float *prev_integral, float *prev_error, float *last_time) {
+int pid_update(int value, int time, int *prev_integral, int *prev_error, int *last_time) {
 
-    float error = SET_POINT - value;
-    float dt = time - *last_time;
+    int error = SET_POINT - value;
+    int dt = time - *last_time;
 
-    float integral = *prev_integral + error * dt;
-    float derivative = (error - *prev_error)/dt;
+    int integral = *prev_integral + error * dt;
+    int derivative = (error - *prev_error)/dt;
 
     *last_time = time;
     *prev_integral = integral;
