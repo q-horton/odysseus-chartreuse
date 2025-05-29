@@ -1,10 +1,13 @@
 #include <zephyr/kernel.h>
 #include <zephyr/device.h>
 #include <zephyr/drivers/uart.h>
+#include <zephyr/logging/log.h>
 
 #include <string.h>
 
 #include "sensordata.h"
+
+LOG_MODULE_REGISTER(espat_mqtt);
 
 static const struct device *const espat_uart = DEVICE_DT_GET(DT_NODELABEL(espat_uart));
 
@@ -12,11 +15,13 @@ static const struct device *const espat_uart = DEVICE_DT_GET(DT_NODELABEL(espat_
 #define ESP_MSG_BUF_SIZE 256
 #define SENSOR_QUEUE_SIZE 50
 
+#define NUM_ESPAT_TERMINATORS 4
+
 // queue to store uart messages from ESP-AT
 K_MSGQ_DEFINE(queue_espat_uart, MSG_SIZE, 10, 4);
 
 // queue to store sensor data to be published
-K_MSGQ_DEFINE(queue_sensor_data, sizeof(struct SensorData), SENSOR_QUEUE_SIZE, 1);
+K_MSGQ_DEFINE(queue_pub_mqtt, sizeof(struct SensorData), SENSOR_QUEUE_SIZE, 1);
 
 // semaphore to tell when ESP-AT is available
 K_SEM_DEFINE(sem_espat, 1, 1);
@@ -24,6 +29,15 @@ K_SEM_DEFINE(sem_espat, 1, 1);
 // rx buffer for uart messages
 static char rx_buf[MSG_SIZE];
 static int rx_buf_pos;
+
+char *espatTerminators[NUM_ESPAT_TERMINATORS] = {
+    "OK",
+    "ERROR",
+    "+MQTTPUB:OK",
+    "WIFI GOT IP"
+};
+
+int x = sizeof(espatTerminators);
 
 void serial_cb(const struct device *dev, void *user_data)
 {
@@ -38,13 +52,17 @@ void serial_cb(const struct device *dev, void *user_data)
 	}
 
 	while (uart_fifo_read(espat_uart, &c, 1) == 1) {
-		if ((c == '\n' || c == '\r') && rx_buf_pos > 0) {
-			rx_buf[rx_buf_pos] = '\0';
-			k_msgq_put(&queue_espat_uart, &rx_buf, K_NO_WAIT);
-			rx_buf_pos = 0;
-		} else if (rx_buf_pos < (sizeof(rx_buf) - 1)) {
-			rx_buf[rx_buf_pos++] = c;
-		}
+        if ((c == '\n' || c == '\r') && rx_buf_pos > 0) {
+            rx_buf[rx_buf_pos] = '\0';
+            k_msgq_put(&queue_espat_uart, &rx_buf, K_NO_WAIT);
+            rx_buf_pos = 0;
+        } 
+        else if ((c == '\n' || c == '\r') && rx_buf_pos == 0) {
+            continue; // ignore newlines before anything else
+        }
+        else if (rx_buf_pos < (sizeof(rx_buf) - 1)) {
+            rx_buf[rx_buf_pos++] = c;
+        }
 	}
 }
 
@@ -101,18 +119,15 @@ void espat_thread() {
     uart_irq_rx_enable(espat_uart);
 
     while (k_msgq_get(&queue_espat_uart, &tx_buf, K_FOREVER) == 0) {
-
-        if (strncmp(tx_buf, "\nOK", 3) == 0) {
-            k_sem_give(&sem_espat);
-        }
-        else if (strncmp(tx_buf, "\nERROR", 6) == 0) {
-            k_sem_give(&sem_espat);
-        }
-        else if (strncmp(tx_buf, "\n+MQTTPUB:OK", 12) == 0) {
-            k_sem_give(&sem_espat);
+        // check if received data is a "terminator" that allows additional
+        // messages to be sent to ESP-AT
+        for (int i = 0; i < NUM_ESPAT_TERMINATORS; i++) {
+            if (!strncmp(tx_buf, espatTerminators[i], strlen(espatTerminators[i]))) {
+                k_sem_give(&sem_espat);
+            }
         }
 
-        printk("Rcvd from ESP-AT: %s\n", tx_buf);
+        LOG_INF("Rcvd from ESP-AT: %s", tx_buf);
 	}
 }
 
@@ -122,7 +137,7 @@ void mqtt_pub_thread() {
     char sensorDataBuf[ESP_MSG_BUF_SIZE];
 
     while (1) {
-        while (k_msgq_get(&queue_sensor_data, &sensorData, K_FOREVER) == 0) {
+        while (k_msgq_get(&queue_pub_mqtt, &sensorData, K_FOREVER) == 0) {
             encode_sensor_data(&sensorData, sensorDataBuf, ESP_MSG_BUF_SIZE);
             espat_mqtt_publish("sensors", sensorDataBuf);
         }

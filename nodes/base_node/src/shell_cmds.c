@@ -7,6 +7,7 @@
 #include "mqtt.h"
 #include "sensordata.h"
 #include "servo.h"
+#include "filesystem.h"
 
 static int cmd_espat_send(const struct shell *sh, size_t argc,
                            char **argv)
@@ -68,9 +69,23 @@ static int cmd_espat_pubsensor(const struct shell *sh, size_t argc,
     data.moisture = atoi(argv[1]);
     data.temperature = atoi(argv[2]);
     data.pressure = atoi(argv[3]);
-    data.time = atoi(argv[4]);
+    data.timestamp = atoi(argv[4]);
 
     k_msgq_put(&queue_sensor_data, &data, K_FOREVER);
+    return 0;
+}
+
+static int cmd_sensorlog_enable(const struct shell *sh, size_t argc,
+                           char **argv)
+{
+    file_log_enable(argv[1]);
+    return 0;
+}
+
+static int cmd_sensorlog_disable(const struct shell *sh, size_t argc,
+                           char **argv)
+{
+    file_log_disable();
     return 0;
 }
 
@@ -90,5 +105,12 @@ SHELL_STATIC_SUBCMD_SET_CREATE(sub_servo,
         SHELL_SUBCMD_SET_END
 );
 
+SHELL_STATIC_SUBCMD_SET_CREATE(sub_sensorlog,
+        SHELL_CMD_ARG(enable, NULL, "Enable sensor logging to a specified file", cmd_sensorlog_enable, 2, 0),
+        SHELL_CMD_ARG(disable, NULL, "Disable sensor logging", cmd_sensorlog_disable, 1, 0),
+        SHELL_SUBCMD_SET_END
+);
+
 SHELL_CMD_REGISTER(espat, &sub_espat, "ESP-AT commands", NULL);
 SHELL_CMD_REGISTER(servo, &sub_servo, "Servo motor commands", NULL);
+SHELL_CMD_REGISTER(sensorlog, &sub_sensorlog, "Sensor FS logging commands", NULL);
