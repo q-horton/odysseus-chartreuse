@@ -8,6 +8,7 @@
 
 #define ADV_THREAD_STACK_SIZE 1024
 #define ADV_THREAD_PRIORITY 5
+#define ADV_PAYLOAD_BUF_SIZE 240 
 
 K_THREAD_STACK_DEFINE(adv_thread_stack, ADV_THREAD_STACK_SIZE);
 static struct k_thread adv_thread_data;
@@ -15,7 +16,6 @@ static struct k_thread adv_thread_data;
 // Semaphore declared in shared_vars.h or another file
 //extern struct k_sem adv_data_ready_sem;
 
-#define ADV_PAYLOAD_BUF_SIZE 240 
 
 K_SEM_DEFINE(adv_data_ready_sem, 0, 1);
 
@@ -207,7 +207,7 @@ int ble_ext_adv_sensordata_start(void) {
         NULL, NULL, NULL,
         ADV_THREAD_PRIORITY, 0, K_NO_WAIT);
 
-
+    return 0;
     // while (1) {
 
     //     // turn into thread with sem so waits for databuff to be filled

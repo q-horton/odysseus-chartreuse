@@ -55,8 +55,8 @@ static bool parse_config_data_from_basenode_ad(struct bt_data *data, void *user_
 
 static void device_found(const bt_addr_le_t *addr, int8_t rssi, uint8_t type, struct net_buf_simple *ad) {
 	
-    if (rssi < RSSI_THRESHOLD) {
-		return; // Ignore weak signals
+    if (rssi < RSSI_THRESHOLD || type == BT_GAP_ADV_TYPE_EXT_ADV) {
+		return; // Ignore weak signals and extended advertising
 	}
 	
 	char addr_str[BT_ADDR_LE_STR_LEN];
@@ -64,20 +64,6 @@ static void device_found(const bt_addr_le_t *addr, int8_t rssi, uint8_t type, st
 	
     if (strcmp(addr_str, BASENODE_MAC) == 0) {
         bt_data_parse(ad, parse_config_data_from_basenode_ad, NULL);
-        //k_sleep(K_MSEC(1000));
-
-		// Disable advertising after receiving config data
-		//bt_le_adv_stop();
-
-		// Potentiaally use a flag to check if already off, so dont repeat operations
-		// 
-		// Enable extended advertising
-
-		// Send data to BaseNode
-
-		// Disable extended advertising
-
-		// Enable legacy advertising
     }
 }
 
@@ -115,6 +101,10 @@ static void scan_recv(const struct bt_le_scan_recv_info *info, struct net_buf_si
 	bt_addr_le_to_str(info->addr, le_addr, sizeof(le_addr));
 	printk("[MOBILE-LOG]: DEVICE %s, RSSI: %d, Data len: %u\n", le_addr, info->rssi, buf->len);
 
+	if (!(info->adv_props & BT_GAP_ADV_PROP_EXT_ADV)) {
+		return; // Skip non-extended (legacy) advertising
+	}
+
 	for (uint8_t i = 0; i < MAX_SENSOR_NODES; i++) {
 		// Check if the sensor node is of interest and not yet collected
 		if (!sensornodes_status[i].collected && strcmp(le_addr, sensornodes_status[i].mac_addr) == 0) { 
@@ -145,7 +135,7 @@ int ble_observers_start(void) {
 	bt_le_scan_cb_register(&scan_callbacks);
 	printk("[MOBILE-LOG] Registered scan callbacks\n");
 
-	err = bt_le_scan_start(&scan_param, device_found); // do nothing if legacy ble device found (previously calls device_found)
+	err = bt_le_scan_start(&scan_param, device_found); 
 	if (err) {
 		printk("[MOBILE-ERR] Start scanning failed (err %d)\n", err);
 		return err;

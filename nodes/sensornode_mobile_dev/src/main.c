@@ -106,8 +106,8 @@ static bool parse_ad_data(struct bt_data *data, void *user_data) {
 
 static void device_found(const bt_addr_le_t *addr, int8_t rssi, uint8_t type, struct net_buf_simple *ad) {
 	
-    if (rssi < RSSI_THRESHOLD) {
-		return; // Ignore weak signals
+    if (rssi < RSSI_THRESHOLD || type == BT_GAP_ADV_TYPE_EXT_ADV) {
+		return; // Ignore weak signals and extended advertisements
 	}
 	char addr_str[BT_ADDR_LE_STR_LEN];
 	bt_addr_le_to_str(addr, addr_str, sizeof(addr_str));

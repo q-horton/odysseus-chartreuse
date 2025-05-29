@@ -54,8 +54,6 @@ static bool parse_ad_data(struct bt_data *data, void *user_data) {
     return true;
 }
 
-
-
 static void scan_recv(const struct bt_le_scan_recv_info *info, struct net_buf_simple *buf) {
 	
 	if (info->rssi < RSSI_THRESHOLD) {
@@ -63,7 +61,7 @@ static void scan_recv(const struct bt_le_scan_recv_info *info, struct net_buf_si
 		return; // Ignore weak signals
 	}
 
-	if (!(info->adv_props & BT_GAP_ADV_PROP_EXT_ADV)) {
+	if (!(info->adv_props & BT_GAP_ADV_PROP_EXT_ADV)) { 
         // Not extended advertising, skip it
         return;
     }
