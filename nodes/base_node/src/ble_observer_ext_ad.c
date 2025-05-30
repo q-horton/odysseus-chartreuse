@@ -26,6 +26,7 @@ LOG_MODULE_REGISTER(basenode_bt_obs);
 const char *nodes_of_interest[] = {
 	"DC:B1:BE:10:38:1E (random)"
 	//"E4:41:28:44:C6:DE (random)"
+	//"C5:84:32:CA:99:CA (random)"
 };
 
 // structure to store sensordata from various nodes scraped
@@ -60,6 +61,8 @@ const bt_addr_le_t target_addr = {
 uint16_t greatestReceivedMeasId = 0;
 
 void parse_sensor_payload(const uint8_t *payload) {
+    int nodeId = payload[0];
+
     for (int i = 0; i < SENSOR_PACKETS_PER_PAYLOAD; i++) {
         int pos = SENSOR_DATA_START + i * SENSOR_DATA_SIZE;
 
@@ -77,6 +80,7 @@ void parse_sensor_payload(const uint8_t *payload) {
 
         // load sensor data struct
         struct SensorData data;
+        data.nodeId = nodeId;
         data.timestamp = timestamp;
         data.moisture = moisture;
         data.pressure = pressure;

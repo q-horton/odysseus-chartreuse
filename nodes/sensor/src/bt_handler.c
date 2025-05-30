@@ -26,6 +26,16 @@ static struct bt_data ad[] = {
     // BT_DATA(BT_DATA_MANUFACTURER_DATA, adv_payload_4, sizeof(adv_payload_4)),
 };
 
+// void shit_me_out(void) {
+// 	for(int i = 0; i < NUM_PAYLOADS; i++) {
+// 		for(int j = 0; j < PAYLOAD_SIZE; j++) {
+// 			printk("%02x ", payloads[i][j]);
+// 		}
+// 		printk("\r\n");
+// 	}
+// 	printk("\r\n");
+// }
+
 static struct bt_le_ext_adv *adv_set;
 
 void init_adv_payload(void) {
@@ -65,7 +75,7 @@ static bool parse_ad_data(struct bt_data *data, void *user_data) {
 
         if (time_delta > MIN_INTERVAL_FOR_UPDATES || time_delta < -MIN_INTERVAL_FOR_UPDATES || get_polling_rate() != payload[4]) {
             LOG_INF("[SENSORNODE-LOG] Received new time: %u, Polling flag: %u\n", newtime, payload[4]);
-            update_sys_time(newtime);
+            update_sys_time(newtime * 1000);
             update_polling_rate(payload[4]);
         }
         k_sem_give(&config_data);
@@ -148,11 +158,12 @@ void bt_handler_t(void) {
 	int index = 0;
 
 	while(1) {
-		LOG_INF("[SENSORNODE-LOG] Updating advertisement data...\n");
         bt_le_ext_adv_stop(adv_set);
         k_msleep(100); // Short delay for service to stop
-		
-		for (int i = 0; i < k_msgq_num_used_get(&sample_stream); i++) {
+
+		int num_samples = k_msgq_num_used_get(&sample_stream);
+		if(num_samples) LOG_INF("[SENSORNODE-LOG] Updating advertisement data...\n");
+		for(int i = 0; i < num_samples; i++) {
 			SensorLoad sample;
 			k_msgq_get(&sample_stream, &sample, K_FOREVER);
 			LOG_INF("Index: %d", index);

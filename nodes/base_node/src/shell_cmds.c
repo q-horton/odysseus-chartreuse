@@ -132,6 +132,28 @@ static int cmd_time_get(const struct shell *sh, size_t argc,
     return 0;
 }
 
+static int cmd_setpoint_set(const struct shell *sh, size_t argc,
+                           char **argv)
+{
+    int val = atoi(argv[1]);
+
+    if (val < 0 || val > 4095) {
+        shell_error(sh, "Set point must be between 1 and 4095");
+        return 1;
+    }
+
+    set_setpoint(val);
+
+    return 0;
+}
+
+static int cmd_setpoint_get(const struct shell *sh, size_t argc,
+                           char **argv)
+{
+    shell_print(sh, "%d", get_setpoint());
+    return 0;
+}
+
 SHELL_STATIC_SUBCMD_SET_CREATE(sub_espat,
         SHELL_CMD_ARG(send, NULL, "Usage: espat send <MESSAGE>", cmd_espat_send, 2, 0),
         SHELL_CMD_ARG(mqtt_conn, NULL, "Usage: espat mqtt_conn <ip> <port>", cmd_espat_mqtt_conn, 3, 0),
@@ -166,9 +188,16 @@ SHELL_STATIC_SUBCMD_SET_CREATE(sub_time,
         SHELL_SUBCMD_SET_END
 );
 
+SHELL_STATIC_SUBCMD_SET_CREATE(sub_setpoint,
+        SHELL_CMD_ARG(set, NULL, "Set setpoint", cmd_setpoint_set, 2, 0),
+        SHELL_CMD_ARG(get, NULL, "Get setpoint", cmd_setpoint_get, 1, 0),
+        SHELL_SUBCMD_SET_END
+);
+
 SHELL_CMD_REGISTER(espat, &sub_espat, "ESP-AT commands", NULL);
 SHELL_CMD_REGISTER(servo, &sub_servo, "Servo motor commands", NULL);
 SHELL_CMD_REGISTER(sensorlog, &sub_sensorlog, "Sensor FS logging commands", NULL);
 SHELL_CMD_REGISTER(sampling, &sub_sampling, "Sensor sampling commands", NULL);
 
-SHELL_CMD_REGISTER(time, &sub_time, "Set clock time", NULL);
+SHELL_CMD_REGISTER(time, &sub_time, "Clock time commands", NULL);
+SHELL_CMD_REGISTER(setpoint, &sub_setpoint, "Setpoint commands", NULL);
