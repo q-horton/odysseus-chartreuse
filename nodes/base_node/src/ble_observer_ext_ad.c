@@ -20,7 +20,7 @@
 LOG_MODULE_REGISTER(basenode_bt_obs);
 
 #define NAME_LEN 30
-#define RSSI_THRESHOLD -50 // RSSI threshold for filtering devices
+#define RSSI_THRESHOLD -40 // RSSI threshold for filtering devices
 
 // array of MAC addresses to filter
 const char *nodes_of_interest[] = {
@@ -41,14 +41,15 @@ struct node_of_interest {
 // store all sensordata scraped from the nodes of interest
 struct node_of_interest nodes[10]; // array of 10 nodes
 
+/*
 const bt_addr_le_t target_addr = {
 	.type = BT_ADDR_LE_RANDOM, 
 	.a = { .val = {0xC5, 0x84, 0x32, 0xCA, 0x99, 0xCA} }
 };
+*/
 
-#define SENSOR_DATA_START 12
 #define SENSOR_DATA_SIZE 12
-#define SENSOR_PACKETS_PER_PAYLOAD 19
+#define SENSOR_PACKETS_PER_PAYLOAD 20
 
 #define TIMESTAMP_OFFSET 0
 #define MEAS_ID_OFFSET 4
@@ -58,13 +59,19 @@ const bt_addr_le_t target_addr = {
 
 #define PRESSURE_BASE 100000
 
+//#define MAX_MEASID_JUMP 50
+
 uint16_t greatestReceivedMeasId = 0;
 
-void parse_sensor_payload(const uint8_t *payload) {
-    int nodeId = payload[0];
+int numPacketsParsed = 0;
 
-    for (int i = 0; i < SENSOR_PACKETS_PER_PAYLOAD; i++) {
-        int pos = SENSOR_DATA_START + i * SENSOR_DATA_SIZE;
+void parse_sensor_payload(const uint8_t *payload) {
+    uint8_t nodeId = payload[0];
+
+    uint8_t isFirst = numPacketsParsed == 0;
+
+    for (int i = 0; i < (isFirst ? SENSOR_PACKETS_PER_PAYLOAD - 1 : SENSOR_PACKETS_PER_PAYLOAD); i++) {
+        int pos = (isFirst ? SENSOR_DATA_SIZE : 0) + i * SENSOR_DATA_SIZE;
 
         uint32_t timestamp = *((uint32_t *) (void *) &payload[pos]);
         uint16_t measId = *((uint16_t *) (void *) &payload[pos + MEAS_ID_OFFSET]);
@@ -96,8 +103,12 @@ void parse_sensor_payload(const uint8_t *payload) {
 static bool parse_ad_data(struct bt_data *data, void *user_data) {
 
     if (data->type == BT_DATA_MANUFACTURER_DATA && data->data_len >= 5) {
+        //LOG_INF("recvd %d\n", data->data_len);
+
         const uint8_t *payload = data->data;
+
         parse_sensor_payload(payload);
+        numPacketsParsed = (numPacketsParsed + 1) % 3;
 
         /*
 		printf("\t \t [DEBUG] Raw AD data: ");
@@ -167,15 +178,12 @@ static bool parse_ad_data(struct bt_data *data, void *user_data) {
 			//LOG_INF("Ignoring weak signal from %s (RSSI %d)\n", le_addr, info->rssi);
 			return; // Ignore weak signals
 		}
+
+        if (!(info->adv_props & BT_GAP_ADV_PROP_EXT_ADV)) {
+            return; // Skip non-extended (legacy) advertising
+        }
 		
 		char le_addr[BT_ADDR_LE_STR_LEN];
-		char name[NAME_LEN];
-		uint16_t data_len;
-		//uint8_t data_status;
-
-		(void)memset(name, 0, sizeof(name));
-		data_len = buf->len;
-		//bt_data_parse(buf, data_cb, name);
 
 		bt_addr_le_to_str(info->addr, le_addr, sizeof(le_addr));
 		//LOG_INF("[DEVICE]: %s, RSSI: %d, Data len: %u\n", le_addr, info->rssi, buf->len);
