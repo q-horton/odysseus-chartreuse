@@ -48,15 +48,6 @@ static struct bt_le_ext_adv *adv_set;
 uint16_t greatestReceivedMeasId = 0;
 
 void update_adv_payload(void) {
-
-    // Put first current_time into first 4 bytes of adv_payload
-    // k_sem_take(&adv_data_ready_sem, K_FOREVER);
-
-    // printk("[MOBILENODE-LOG] RAW DATABUFF...\n");
-    // for (int i = 0; i < 1650; i++) {
-    //     printk("%02X ", databuffer[i]); // Clear the buffer
-    // }
-    // printk("\n\n");
     
     // Remaining bytes can remain zero
     for (int i = 0; i < ADV_PAYLOAD_BUF_SIZE; i++) {
@@ -133,7 +124,6 @@ void adv_update_thread(void *a, void *b, void *c) {
         //k_sem_give(&wait_for_ext_adv_update_sem); // Signal that update is done
     }
 }
-
 
 int ble_ext_adv_sensordata_start(void) {
     int err;

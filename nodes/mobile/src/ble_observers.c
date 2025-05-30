@@ -20,7 +20,8 @@ typedef struct {
 
 sensor_nodes_t sensornodes_status[MAX_SENSOR_NODES] = {
 	// {"C5:84:32:CA:99:CA (random)", false}
-	{"E4:41:28:44:C6:DE (random)", false}
+	// {"E4:41:28:44:C6:DE (random)", false}
+	{"C5:84:32:CA:99:CA (random)", false}
 	// Add more MACs here
 };
 
@@ -86,7 +87,7 @@ static bool parse_ad_data(struct bt_data *data, void *user_data) {
 		}
 
 		printk("[MOBILE-LOG] Parsed SensorData\n");
-		k_sem_give(&adv_data_ready_sem); // Signal that new data is ready
+		//k_sem_give(&adv_data_ready_sem); // Signal that new data is ready
     }
     return true;
 }
@@ -110,6 +111,7 @@ static void scan_recv(const struct bt_le_scan_recv_info *info, struct net_buf_si
 		if (!sensornodes_status[i].collected && strcmp(le_addr, sensornodes_status[i].mac_addr) == 0) { 
 			bt_data_parse(buf, parse_ad_data, NULL);
 			sensornodes_status[i].collected = true;  // Mark as collected
+			k_sem_give(&adv_data_ready_sem); // Signal that new data is ready
 			//k_sleep(K_MSEC(1000)); // Optional pause
 			break; // Stop loop once matched
 		}
